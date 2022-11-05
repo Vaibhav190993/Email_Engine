@@ -49,8 +49,8 @@ def register():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, password =hashed_password)
-        db.session.add(user)
-        db.session.commit()
+        db.session.add(user)     #to add to session
+        db.session.commit()    #to save session
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -61,8 +61,8 @@ def send_email():
     form = SendEmailForm()
     if form.validate_on_submit():
         send_mail =  SendMail(email = form.email.data, subject = form.subject.data, message = form.message.data, user_id = current_user.id)
-        db.session.add(send_mail)
-        db.session.commit()
+        db.session.add(send_mail)   #to add to session
+        db.session.commit()    #to save session
         message = Message(
             subject=form.subject.data,
             recipients=[form.email.data])
@@ -76,9 +76,7 @@ def send_email():
 @app.route("/sent_mails")
 @login_required
 def sent_mail_data():
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     mails = SendMail.query.filter(SendMail.user_id == current_user.id)
-    # mails = SendMail.query.all()
     return render_template('home.html', mails=mails)
 
 @app.route("/logout")
@@ -108,12 +106,3 @@ def delete_mail(mail_id):
     db.session.commit()
     flash('Your mail has been deleted!', 'success')
     return redirect(url_for('sent_mail_data'))
-
-# @app.route("/mails/delete", methods=['GET'])
-# @login_required
-# def delete_mailsss():
-#     try:
-#         num_rows_deleted = db.session.query(SendMail).delete()
-#         db.session.commit()
-#     except:
-#         db.session.rollback()
